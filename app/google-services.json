@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "397466798495",
+    "project_id": "adm-personal",
+    "storage_bucket": "adm-personal.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:397466798495:android:3cf7b6280626895ff915aa",
+        "android_client_info": {
+          "package_name": "com.example.adm_personal"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "397466798495-ocrevigjim35io0r9fbl15tm3f0o5iuk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCK5h6Pewfc9uwd7IW9Nm68peqX6Dm9Xl0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "397466798495-ocrevigjim35io0r9fbl15tm3f0o5iuk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
