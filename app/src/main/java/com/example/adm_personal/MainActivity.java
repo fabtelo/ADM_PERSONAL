@@ -31,7 +31,6 @@ public class MainActivity extends AppCompatActivity {
 
     private String nombre,correo,id;
     //private DatabaseReference nodo=FirebaseDatabase.getInstance().getReference("P-ASTX1");
-private Button googleAuth;
     //base de datos firebase
 private FirebaseDatabase database;
     //inicio de sesion google-firebase
@@ -45,18 +44,12 @@ private int RC_SIGN_IN=20;
 //instanciando
         database=FirebaseDatabase.getInstance();
         auth=FirebaseAuth.getInstance();
-        googleAuth=findViewById(R.id.button1);
         GoogleSignInOptions gso=new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken("397466798495-ocrevigjim35io0r9fbl15tm3f0o5iuk.apps.googleusercontent.com")
                 .requestEmail().build();
         mGoogleSignInClient=GoogleSignIn.getClient(this,gso);
 
-        googleAuth.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                googleSignIn();
-            }
-        });
+        googleSignIn();
 
     }
 

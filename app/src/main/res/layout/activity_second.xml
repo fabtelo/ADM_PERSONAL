@@ -58,9 +58,15 @@
                 android:hint="placa"
                 android:inputType="text" />
 
+            <Button
+                android:id="@+id/button13"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:text="0" />
+
             <Spinner
                 android:id="@+id/spinnerChofer"
-                android:layout_width="400dp"
+                android:layout_width="300dp"
                 android:layout_height="50dp"
                 android:layout_weight="1" />
 
@@ -91,12 +97,12 @@
 
             <EditText
                 android:id="@+id/editTextEmpresa"
-                android:layout_width="wrap_content"
+                android:layout_width="150dp"
                 android:layout_height="50dp"
                 android:layout_weight="1"
                 android:ems="10"
-                android:inputType="text"
-                android:text="Name" />
+                android:hint="Nombre de la empresa"
+                android:inputType="text" />
 
             <EditText
                 android:id="@+id/editTextMotivo"
@@ -104,8 +110,8 @@
                 android:layout_height="50dp"
                 android:layout_weight="1"
                 android:ems="10"
-                android:inputType="text"
-                android:text="Name" />
+                android:hint="motivo de traslado"
+                android:inputType="text" />
         </LinearLayout>
         <LinearLayout
             android:id="@+id/layout1bd"
@@ -118,59 +124,34 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp" />
 
-            <EditText
-                android:id="@+id/editTextText3"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:ems="10"
-                android:hint="1 pasajero"
-                android:inputType="text"
-                android:text="Name" />
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
 
-            <EditText
-                android:id="@+id/editTextText4"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:ems="10"
-                android:hint="2 pasajero"
-                android:inputType="text"
-                android:text="Name" />
+                <EditText
+                    android:id="@+id/editTextText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="50dp"
+                    android:layout_weight="1"
+                    android:ems="10"
+                    android:hint="Nombre del pasajero"
+                    android:inputType="text" />
 
-            <EditText
-                android:id="@+id/editTextText5"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:ems="10"
-                android:hint="3 pasajero"
-                android:inputType="text"
-                android:text="Name" />
+                <Button
+                    android:id="@+id/button7"
+                    android:layout_width="40dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Agregar" />
+            </LinearLayout>
 
-            <EditText
-                android:id="@+id/editTextText6"
+            <ScrollView
+                android:id="@+id/scrollviewPasajeros"
+                android:contentDescription="Lista de pasajeros"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:ems="10"
-                android:hint="4 pasajero"
-                android:inputType="text"
-                android:text="Name" />
+                android:layout_height="330dp" />
 
-            <EditText
-                android:id="@+id/editTextText7"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:ems="10"
-                android:hint="5 pasajero"
-                android:inputType="text"
-                android:text="Name" />
-
-            <EditText
-                android:id="@+id/editTextText8"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:ems="10"
-                android:hint="6 pasajero"
-                android:inputType="text"
-                android:text="Name" />
         </LinearLayout>
         <LinearLayout
             android:id="@+id/layout1be"
@@ -181,13 +162,12 @@
 
             <EditText
                 android:id="@+id/editTextNameChofer"
-                android:layout_width="wrap_content"
+                android:layout_width="400dp"
                 android:layout_height="50dp"
-                android:layout_weight="1"
+                android:layout_weight="2"
                 android:ems="10"
-                android:hint="ingrese nombre de chofer"
-                android:inputType="text"
-                android:text="Name" />
+                android:hint="nombre de chofer"
+                android:inputType="text" />
 
             <EditText
                 android:id="@+id/editTextCiChofer"
@@ -196,8 +176,7 @@
                 android:layout_weight="1"
                 android:ems="10"
                 android:hint="ingrese C.I."
-                android:inputType="text"
-                android:text="Name" />
+                android:inputType="number" />
         </LinearLayout>
 
     </LinearLayout>
