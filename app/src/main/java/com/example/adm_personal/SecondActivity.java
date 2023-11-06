@@ -21,12 +21,15 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 
 public class SecondActivity extends AppCompatActivity {
+    private EditText txtPlaca;
+    private int choferSN;
+    private String placaC;
     private DatabaseReference nodo= FirebaseDatabase.getInstance().getReference("g-astx1");
     private Button registroB,turnosB,permisosB,entrandoB,saliendoB,enpozoB,btnAgregar,buscarVehiculo;
 //seteo spinners
-    private Spinner spTipoV,spTurnos,spOrigen,spDestino;
-    private ArrayList<String> spArrayTipoV,spArrayTurnos,spArrayOD;
-    private ArrayAdapter<String> adapterArrayTipoV,adapterArrayTurnos,adapterArrayOD;
+    private Spinner spTipoV,spTurnos,spOrigen,spDestino,spChofer;
+    private ArrayList<String> spArrayTipoV,spArrayTurnos,spArrayOD,spArrayChofer;
+    private ArrayAdapter<String> adapterArrayTipoV,adapterArrayTurnos,adapterArrayOD,adapterArrayChofer;
     private DatabaseReference refTipoV;
 
     @Override
@@ -34,6 +37,7 @@ public class SecondActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_second);
 
+        txtPlaca=findViewById(R.id.editTextPlaca);
         refTipoV=FirebaseDatabase.getInstance().getReference("g-astx1").child("tipo vehiculo");
 //instanciando Spinners
         spTipoV=findViewById(R.id.spinnerTipoV);
@@ -56,6 +60,11 @@ public class SecondActivity extends AppCompatActivity {
         spOrigen.setAdapter(adapterArrayOD);
         llenarSpOD();
 
+        spChofer=findViewById(R.id.spinnerChofer);
+        spArrayChofer=new ArrayList<String>();
+        adapterArrayChofer=new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item,spArrayChofer);
+        spChofer.setAdapter(adapterArrayChofer);
+        llenarSpChofer();
 //instanciando botones
         turnosB=findViewById(R.id.button);
         registroB=findViewById(R.id.button2);
@@ -117,6 +126,23 @@ public class SecondActivity extends AppCompatActivity {
         });
     }
 
+    private void llenarSpChofer() {
+       /* nodo.child("vehiculos").child(placaC).child("choferes").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot item:snapshot.getChildren()){
+                    spArrayChofer.add(item.getValue().toString());
+                }
+                adapterArrayChofer.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });*/
+    }
+
     private void llenarSpOD() {
         nodo.child("locaciones").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -170,7 +196,45 @@ public class SecondActivity extends AppCompatActivity {
     }
 
     private void buscarVehiculito() {
+        choferSN=0;
+        placaC=" ";
+        nodo.child("vehiculos").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for(DataSnapshot item:snapshot.getChildren()){
+                    if(item.getKey().toString().equalsIgnoreCase(txtPlaca.getText().toString())){
+                        choferSN++;
+                        placaC=item.getKey().toString();
+                    }
+                }
+                setearSpChofer();
+            }
 
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void setearSpChofer() {
+        spArrayChofer.clear();
+        if(choferSN==1){
+            nodo.child("vehiculos").child(placaC).child("choferes").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    for (DataSnapshot item:snapshot.getChildren()){
+                        spArrayChofer.add(item.getValue().toString());
+                    }
+                    adapterArrayChofer.notifyDataSetChanged();
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+        }else Toast.makeText(this,"No se encuentra vehiculo",Toast.LENGTH_SHORT).show();
     }
 
 
