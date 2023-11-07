@@ -5,8 +5,9 @@
     android:id="@+id/layout1"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".SecondActivity"
-    android:orientation="vertical">
+    android:clickable="true"
+    android:orientation="vertical"
+    tools:context=".SecondActivity">
 
 
     <LinearLayout
@@ -71,11 +72,12 @@
                 android:layout_weight="1" />
 
         </LinearLayout>
+
         <LinearLayout
             android:id="@+id/layout1bb"
-            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
             <Spinner
                 android:id="@+id/spinnerOrigen"
@@ -89,11 +91,12 @@
                 android:layout_height="50dp"
                 android:layout_weight="1" />
         </LinearLayout>
+
         <LinearLayout
             android:id="@+id/layout1bc"
-            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
             <EditText
                 android:id="@+id/editTextEmpresa"
@@ -113,11 +116,12 @@
                 android:hint="motivo de traslado"
                 android:inputType="text" />
         </LinearLayout>
+
         <LinearLayout
             android:id="@+id/layout1bd"
-            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -159,16 +163,20 @@
 
             <ScrollView
                 android:id="@+id/scrollviewPasajeros"
-                android:contentDescription="Lista de pasajeros"
                 android:layout_width="match_parent"
-                android:layout_height="330dp" />
+                android:layout_height="330dp"
+                android:contentDescription="Lista de pasajeros"
+                android:contextClickable="true" >
+
+            </ScrollView>
 
         </LinearLayout>
+
         <LinearLayout
             android:id="@+id/layout1be"
-            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
 
             <EditText

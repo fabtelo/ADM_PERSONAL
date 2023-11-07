@@ -1,14 +1,22 @@
 package com.example.adm_personal;
 
+import static android.app.PendingIntent.getActivity;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -21,24 +29,40 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 
 public class SecondActivity extends AppCompatActivity {
-    private EditText txtPlaca;
+    private ScrollView scPasajeros;
+    private EditText txtPlaca,txtnEmpresa,txtmotivoT,txtnPasajero,txtnChofer,txtnroCI;
     private int choferSN;
     private String placaC;
     private DatabaseReference nodo= FirebaseDatabase.getInstance().getReference("g-astx1");
     private Button registroB,turnosB,permisosB,entrandoB,saliendoB,enpozoB,btnAgregar,buscarVehiculo;
 //seteo spinners
     private Spinner spTipoV,spTurnos,spOrigen,spDestino,spChofer;
-    private ArrayList<String> spArrayTipoV,spArrayTurnos,spArrayOD,spArrayChofer;
-    private ArrayAdapter<String> adapterArrayTipoV,adapterArrayTurnos,adapterArrayOD,adapterArrayChofer;
+    private ArrayList<String> spArrayTipoV,spArrayTurnos,spArrayOD,spArrayOD2,spArrayChofer;
+    private ArrayAdapter<String> adapterArrayTipoV,adapterArrayTurnos,adapterArrayOD,adapterArrayOD2,adapterArrayChofer;
     private DatabaseReference refTipoV;
-
+//METODO ON CREATE
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_second);
 
-        txtPlaca=findViewById(R.id.editTextPlaca);
         refTipoV=FirebaseDatabase.getInstance().getReference("g-astx1").child("tipo vehiculo");
+//instaciando ScrollView
+        scPasajeros=findViewById(R.id.scrollviewPasajeros);
+        scPasajeros.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent event) {
+                    esconderKeyboard();
+                return false;
+            }
+        });
+//instanciando editText
+        txtPlaca=findViewById(R.id.editTextPlaca);
+        txtnEmpresa=findViewById(R.id.editTextEmpresa);
+        txtmotivoT=findViewById(R.id.editTextMotivo);
+        txtnPasajero=findViewById(R.id.editTextText);
+        txtnChofer=findViewById(R.id.editTextNameChofer);
+        txtnroCI=findViewById(R.id.editTextCiChofer);
 //instanciando Spinners
         spTipoV=findViewById(R.id.spinnerTipoV);
         spArrayTipoV=new ArrayList<String>();
@@ -55,8 +79,10 @@ public class SecondActivity extends AppCompatActivity {
         spOrigen=findViewById(R.id.spinnerOrigen);
         spDestino=findViewById(R.id.spinnerDestino);
         spArrayOD=new ArrayList<String>();
+        spArrayOD2=new ArrayList<String>();
         adapterArrayOD= new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item,spArrayOD);
-        spDestino.setAdapter(adapterArrayOD);
+        adapterArrayOD2= new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item,spArrayOD2);
+        spDestino.setAdapter(adapterArrayOD2);
         spOrigen.setAdapter(adapterArrayOD);
         llenarSpOD();
 
@@ -64,7 +90,6 @@ public class SecondActivity extends AppCompatActivity {
         spArrayChofer=new ArrayList<String>();
         adapterArrayChofer=new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item,spArrayChofer);
         spChofer.setAdapter(adapterArrayChofer);
-        llenarSpChofer();
 //instanciando botones
         turnosB=findViewById(R.id.button);
         registroB=findViewById(R.id.button2);
@@ -126,21 +151,12 @@ public class SecondActivity extends AppCompatActivity {
         });
     }
 
-    private void llenarSpChofer() {
-       /* nodo.child("vehiculos").child(placaC).child("choferes").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot item:snapshot.getChildren()){
-                    spArrayChofer.add(item.getValue().toString());
-                }
-                adapterArrayChofer.notifyDataSetChanged();
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });*/
+    private void esconderKeyboard() {
+        View view = this.getCurrentFocus();
+        if (view != null) {
+            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
     }
 
     private void llenarSpOD() {
@@ -152,12 +168,28 @@ public class SecondActivity extends AppCompatActivity {
                 }
                 adapterArrayOD.notifyDataSetChanged();
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
+                Toast.makeText(getApplicationContext(),"Error con la Base de Datos",Toast.LENGTH_SHORT).show();
             }
         });
+        llenarSpOD2();
+    }
+    private void llenarSpOD2() {
+        nodo.child("destino").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for(DataSnapshot item:snapshot.getChildren()){
+                    spArrayOD2.add(item.getValue().toString());
+                }
+                adapterArrayOD2.notifyDataSetChanged();
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(getApplicationContext(),"Error con la Base de Datos",Toast.LENGTH_SHORT).show();
+            }
+        });
+
     }
 
     private void llenarSpTurnos() {
@@ -169,16 +201,14 @@ public class SecondActivity extends AppCompatActivity {
                 }
                 adapterArrayTurnos.notifyDataSetChanged();
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
+                Toast.makeText(getApplicationContext(),"Error con la Base de Datos",Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     private void llenarSpTipoV() {
-
         refTipoV.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -187,15 +217,15 @@ public class SecondActivity extends AppCompatActivity {
                 }
                 adapterArrayTipoV.notifyDataSetChanged();
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
+                Toast.makeText(getApplicationContext(),"Error con la Base de Datos",Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     private void buscarVehiculito() {
+        esconderKeyboard();
         choferSN=0;
         placaC=" ";
         nodo.child("vehiculos").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -209,10 +239,9 @@ public class SecondActivity extends AppCompatActivity {
                 }
                 setearSpChofer();
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
+                Toast.makeText(getApplicationContext(),"Error con base de datos",Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -239,6 +268,7 @@ public class SecondActivity extends AppCompatActivity {
 
 
     private void agregar() {
+        esconderKeyboard();
         Toast.makeText(this,"Agregando Pasajero",Toast.LENGTH_SHORT).show();
     }
     private void enPozo() {
@@ -247,10 +277,12 @@ public class SecondActivity extends AppCompatActivity {
     }
 
     private void saliendo() {
+        esconderKeyboard();
         Toast.makeText(this,"saliendo",Toast.LENGTH_SHORT).show();
     }
 
     private void entrando() {
+        esconderKeyboard();
         Toast.makeText(this,"ingresando",Toast.LENGTH_SHORT).show();
     }
 
