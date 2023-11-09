@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -30,8 +31,7 @@ import java.util.HashMap;
 public class MainActivity extends AppCompatActivity {
 
     private String nombre,correo,id;
-    //private DatabaseReference nodo=FirebaseDatabase.getInstance().getReference("P-ASTX1");
-    //base de datos firebase
+    private ImageView sinopec;
 private FirebaseDatabase database;
     //inicio de sesion google-firebase
 private FirebaseAuth auth;
@@ -42,6 +42,7 @@ private int RC_SIGN_IN=20;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 //instanciando
+        sinopec=findViewById(R.id.imageView);
         database=FirebaseDatabase.getInstance();
         auth=FirebaseAuth.getInstance();
         GoogleSignInOptions gso=new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -50,6 +51,12 @@ private int RC_SIGN_IN=20;
         mGoogleSignInClient=GoogleSignIn.getClient(this,gso);
 
         googleSignIn();
+        sinopec.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                irSecond();
+            }
+        });
 
     }
 
@@ -90,9 +97,15 @@ private int RC_SIGN_IN=20;
                             Intent intent=new Intent(MainActivity.this,SecondActivity.class);
                             startActivity(intent);
                         }else {
-                            Toast.makeText(MainActivity.this,"Algo salio mal!",Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(MainActivity.this,"Algo salio mal!",Toast.LENGTH_SHORT).show();
+                            irSecond();
                         }
                     }
                 });
     }
-}
+    private void irSecond(){
+        Intent intent=new Intent(this,SecondActivity.class);
+        startActivity(intent);
+        }
+
+    }

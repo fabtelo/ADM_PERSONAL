@@ -2,6 +2,10 @@ package com.example.adm_personal;
 
 import static android.app.PendingIntent.getActivity;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.text.SimpleDateFormat;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -12,12 +16,14 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
@@ -27,16 +33,31 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 
 public class SecondActivity extends AppCompatActivity {
+//seteo de fecha
+    private Date fecha=new Date();
+    private SimpleDateFormat fechaF=new SimpleDateFormat("dd:MM:YY");
+    private SimpleDateFormat agno=new SimpleDateFormat("YYYY");
+    private SimpleDateFormat mes=new SimpleDateFormat("MM");
+    private String fechac=fechaF.format(fecha);
+    private String ScStPasajeros="";
+//seteo string scrollview pasajeros
+    private TextView txtPasajeros;
+
+    //otros
     private ScrollView scPasajeros;
     private EditText txtPlaca,txtnEmpresa,txtmotivoT,txtnPasajero,txtnChofer,txtnroCI;
-    private int choferSN;
+    private int choferSN,
+        intPosicion;
     private String placaC;
     private DatabaseReference nodo= FirebaseDatabase.getInstance().getReference("g-astx1");
     private Button registroB,turnosB,permisosB,entrandoB,saliendoB,enpozoB,btnAgregar,buscarVehiculo;
 //seteo spinners
     private Spinner spTipoV,spTurnos,spOrigen,spDestino,spChofer;
+    private ArrayList<String> arrayListCi=new ArrayList<String>();
     private ArrayList<String> spArrayTipoV,spArrayTurnos,spArrayOD,spArrayOD2,spArrayChofer;
     private ArrayAdapter<String> adapterArrayTipoV,adapterArrayTurnos,adapterArrayOD,adapterArrayOD2,adapterArrayChofer;
     private DatabaseReference refTipoV;
@@ -45,7 +66,17 @@ public class SecondActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_second);
+        nodo.child("posicion").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                intPosicion=Integer.parseInt(snapshot.getValue().toString());
+            }
 
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
         refTipoV=FirebaseDatabase.getInstance().getReference("g-astx1").child("tipo vehiculo");
 //instaciando ScrollView
         scPasajeros=findViewById(R.id.scrollviewPasajeros);
@@ -56,6 +87,7 @@ public class SecondActivity extends AppCompatActivity {
                 return false;
             }
         });
+        txtPasajeros=findViewById(R.id.textView3);
 //instanciando editText
         txtPlaca=findViewById(R.id.editTextPlaca);
         txtnEmpresa=findViewById(R.id.editTextEmpresa);
@@ -75,6 +107,16 @@ public class SecondActivity extends AppCompatActivity {
         adapterArrayTurnos=new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item,spArrayTurnos);
         spTurnos.setAdapter(adapterArrayTurnos);
         llenarSpTurnos();
+        spTurnos.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+              setearTxtTurno();
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
 
         spOrigen=findViewById(R.id.spinnerOrigen);
         spDestino=findViewById(R.id.spinnerDestino);
@@ -87,6 +129,15 @@ public class SecondActivity extends AppCompatActivity {
         llenarSpOD();
 
         spChofer=findViewById(R.id.spinnerChofer);
+        spChofer.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                seteNChCi();
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+            }
+        });
         spArrayChofer=new ArrayList<String>();
         adapterArrayChofer=new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item,spArrayChofer);
         spChofer.setAdapter(adapterArrayChofer);
@@ -149,6 +200,15 @@ public class SecondActivity extends AppCompatActivity {
                 buscarVehiculito();
             }
         });
+    }
+
+    private void setearTxtTurno() {
+        txtnPasajero.setText(spTurnos.getSelectedItem().toString());
+    }
+
+    private void seteNChCi() {
+        txtnChofer.setText(spChofer.getSelectedItem().toString());
+        txtnroCI.setText(arrayListCi.get(spChofer.getSelectedItemPosition()).toString());
     }
 
     private void esconderKeyboard() {
@@ -254,6 +314,7 @@ public class SecondActivity extends AppCompatActivity {
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     for (DataSnapshot item:snapshot.getChildren()){
                         spArrayChofer.add(item.getValue().toString());
+                        arrayListCi.add(item.getKey().toString());
                     }
                     adapterArrayChofer.notifyDataSetChanged();
                 }
@@ -269,7 +330,13 @@ public class SecondActivity extends AppCompatActivity {
 
     private void agregar() {
         esconderKeyboard();
-        Toast.makeText(this,"Agregando Pasajero",Toast.LENGTH_SHORT).show();
+        if(txtnPasajero.getText().toString().length()>2){
+            String nombreG=txtnPasajero.getText().toString();
+            ScStPasajeros=ScStPasajeros+"\n"+nombreG+",";
+            txtnPasajero.setText(null);
+            txtPasajeros.setText(ScStPasajeros);
+        }else Toast.makeText(getApplicationContext(),"Texto insuficiente",Toast.LENGTH_SHORT).show();
+
     }
     private void enPozo() {
         Intent intent=new Intent(this,ActivityPresentes.class);
@@ -278,12 +345,24 @@ public class SecondActivity extends AppCompatActivity {
 
     private void saliendo() {
         esconderKeyboard();
-        Toast.makeText(this,"saliendo",Toast.LENGTH_SHORT).show();
+        if(txtPlaca.getText().toString().length()>3 &&
+                txtnEmpresa.getText().toString().length()>3 &&
+                txtnChofer.getText().toString().length()>3&&
+                txtnroCI.getText().toString().length()>3&&
+                txtmotivoT.getText().toString().length()>3){
+            registroGRAL();
+        }else Toast.makeText(this,"Saliendo no tuvo exito",Toast.LENGTH_SHORT).show();
     }
 
     private void entrando() {
         esconderKeyboard();
-        Toast.makeText(this,"ingresando",Toast.LENGTH_SHORT).show();
+        if(txtPlaca.getText().toString().length()>3 &&
+                txtnEmpresa.getText().toString().length()>3 &&
+                txtnChofer.getText().toString().length()>3&&
+                txtnroCI.getText().toString().length()>3&&
+                txtmotivoT.getText().toString().length()>3){
+            registroGRAL();
+        }else  Toast.makeText(this,"entrando no pudo pocesar",Toast.LENGTH_SHORT).show();
     }
 
     private void irPermisos() {
@@ -300,5 +379,33 @@ public class SecondActivity extends AppCompatActivity {
         Intent intent=new Intent(this,ActivityTurnos.class);
         startActivity(intent);
     }
+    private void registroGRAL(){
+        intPosicion++;
+        String hora=new SimpleDateFormat("HH:mm").format(Calendar.getInstance().getTime());
+        HashMap<String,Object> map=new HashMap<>();
+        map.put("hora",hora);
+        map.put("nombre",txtnChofer.getText().toString());
+        map.put("CI",txtnroCI.getText().toString());
+        map.put("empresa",txtnEmpresa.getText().toString());
+        map.put("origen",spOrigen.getSelectedItem().toString());
+        map.put("destino",spDestino.getSelectedItem().toString());
+        map.put("pasajeros",ScStPasajeros);
+        map.put("motivo",txtmotivoT.getText().toString());
+        map.put("placa",txtPlaca.getText().toString());
+        map.put("tipo de vehiculo",spTipoV.getSelectedItem().toString());
+        nodo.child(agno.format(fecha)).child(mes.format(fecha)).child(fechac).child(Integer.toString(intPosicion)).setValue(map);
+        nodo.child("posicion").setValue(intPosicion);
+        limpiarEditsTxt();
+    }
 
+    private void limpiarEditsTxt() {
+        txtPlaca.setText(null);
+        txtnEmpresa.setText(null);
+        txtmotivoT.setText(null);
+        txtnChofer.setText(null);
+        txtnroCI.setText(null);
+        spArrayChofer.clear();
+        adapterArrayChofer.notifyDataSetChanged();
+        txtPasajeros.setText(null);
+    }
 }

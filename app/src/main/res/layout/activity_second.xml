@@ -168,6 +168,12 @@
                 android:contentDescription="Lista de pasajeros"
                 android:contextClickable="true" >
 
+                <TextView
+                    android:id="@+id/textView3"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Pasajeros"
+                    android:textSize="20sp" />
             </ScrollView>
 
         </LinearLayout>
