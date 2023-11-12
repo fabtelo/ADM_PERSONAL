@@ -97,7 +97,7 @@ private int RC_SIGN_IN=20;
                             Intent intent=new Intent(MainActivity.this,SecondActivity.class);
                             startActivity(intent);
                         }else {
-                            //Toast.makeText(MainActivity.this,"Algo salio mal!",Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MainActivity.this,"Algo salio mal!",Toast.LENGTH_SHORT).show();
                             irSecond();
                         }
                     }

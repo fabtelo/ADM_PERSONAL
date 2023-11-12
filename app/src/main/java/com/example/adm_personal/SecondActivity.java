@@ -26,6 +26,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -37,9 +39,13 @@ import java.util.Date;
 import java.util.HashMap;
 
 public class SecondActivity extends AppCompatActivity {
+//entrando metodos
+    private ArrayList<String> arrayListPresentes=new ArrayList<String>();
+    private ArrayList<String> arrayListPosiPrese=new ArrayList<String>();
+    private int posicionPozo;
 //seteo de fecha
     private Date fecha=new Date();
-    private SimpleDateFormat fechaF=new SimpleDateFormat("dd:MM:YY");
+    private SimpleDateFormat fechaF=new SimpleDateFormat("dd");
     private SimpleDateFormat agno=new SimpleDateFormat("YYYY");
     private SimpleDateFormat mes=new SimpleDateFormat("MM");
     private String fechac=fechaF.format(fecha);
@@ -50,8 +56,8 @@ public class SecondActivity extends AppCompatActivity {
     //otros
     private ScrollView scPasajeros;
     private EditText txtPlaca,txtnEmpresa,txtmotivoT,txtnPasajero,txtnChofer,txtnroCI;
-    private int choferSN,
-        intPosicion;
+    private int intPosicion;
+    private int choferSN;
     private String placaC;
     private DatabaseReference nodo= FirebaseDatabase.getInstance().getReference("g-astx1");
     private Button registroB,turnosB,permisosB,entrandoB,saliendoB,enpozoB,btnAgregar,buscarVehiculo;
@@ -132,7 +138,7 @@ public class SecondActivity extends AppCompatActivity {
         spChofer.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                seteNChCi();
+                seteNChCi(i);
             }
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {
@@ -206,9 +212,9 @@ public class SecondActivity extends AppCompatActivity {
         txtnPasajero.setText(spTurnos.getSelectedItem().toString());
     }
 
-    private void seteNChCi() {
+    private void seteNChCi(int i) {
         txtnChofer.setText(spChofer.getSelectedItem().toString());
-        txtnroCI.setText(arrayListCi.get(spChofer.getSelectedItemPosition()).toString());
+        txtnroCI.setText(arrayListCi.get(i));
     }
 
     private void esconderKeyboard() {
@@ -286,6 +292,8 @@ public class SecondActivity extends AppCompatActivity {
 
     private void buscarVehiculito() {
         esconderKeyboard();
+        spArrayChofer.clear();
+        arrayListCi.clear();
         choferSN=0;
         placaC=" ";
         nodo.child("vehiculos").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -307,7 +315,6 @@ public class SecondActivity extends AppCompatActivity {
     }
 
     private void setearSpChofer() {
-        spArrayChofer.clear();
         if(choferSN==1){
             nodo.child("vehiculos").child(placaC).child("choferes").addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
@@ -317,11 +324,11 @@ public class SecondActivity extends AppCompatActivity {
                         arrayListCi.add(item.getKey().toString());
                     }
                     adapterArrayChofer.notifyDataSetChanged();
+                    txtnChofer.setText(spArrayChofer.get(0));
+                    txtnroCI.setText(arrayListCi.get(0));
                 }
-
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {
-
                 }
             });
         }else Toast.makeText(this,"No se encuentra vehiculo",Toast.LENGTH_SHORT).show();
@@ -332,12 +339,29 @@ public class SecondActivity extends AppCompatActivity {
         esconderKeyboard();
         if(txtnPasajero.getText().toString().length()>2){
             String nombreG=txtnPasajero.getText().toString();
-            ScStPasajeros=ScStPasajeros+"\n"+nombreG+",";
-            txtnPasajero.setText(null);
+            ScStPasajeros=ScStPasajeros+"\n"+"        "+nombreG;
             txtPasajeros.setText(ScStPasajeros);
+
+            getPosicionPozo();
         }else Toast.makeText(getApplicationContext(),"Texto insuficiente",Toast.LENGTH_SHORT).show();
 
     }
+
+    private void getPosicionPozo() {
+        nodo.child("pozo").child("posicion").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                posicionPozo=Integer.parseInt(snapshot.getValue().toString());
+                agregaMap(posicionPozo);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
     private void enPozo() {
         Intent intent=new Intent(this,ActivityPresentes.class);
         startActivity(intent);
@@ -362,7 +386,28 @@ public class SecondActivity extends AppCompatActivity {
                 txtnroCI.getText().toString().length()>3&&
                 txtmotivoT.getText().toString().length()>3){
             registroGRAL();
+            ingresaPasajero();
         }else  Toast.makeText(this,"entrando no pudo pocesar",Toast.LENGTH_SHORT).show();
+    }
+
+    private void agregaMap(int i) {
+        int posi=i;
+        arrayListPresentes.add(txtnPasajero.getText().toString());
+        arrayListPosiPrese.add(Integer.toString(posi++));
+        nodo.child("pozo").child("posicion").setValue(posi).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                txtnPasajero.setText(null);
+            }
+        });
+    }
+
+    private void ingresaPasajero() {
+        for(int i=0;i<arrayListPresentes.size();i++){
+          nodo.child("pozo").child("presentes").child(arrayListPosiPrese.get(i)).setValue(arrayListPresentes.get(i));
+        }
+        arrayListPosiPrese.clear();
+        arrayListPresentes.clear();
     }
 
     private void irPermisos() {
@@ -393,7 +438,7 @@ public class SecondActivity extends AppCompatActivity {
         map.put("motivo",txtmotivoT.getText().toString());
         map.put("placa",txtPlaca.getText().toString());
         map.put("tipo de vehiculo",spTipoV.getSelectedItem().toString());
-        nodo.child(agno.format(fecha)).child(mes.format(fecha)).child(fechac).child(Integer.toString(intPosicion)).setValue(map);
+        nodo.child("registro").child(agno.format(fecha)).child(mes.format(fecha)).child(fechac).child(Integer.toString(intPosicion)).setValue(map);
         nodo.child("posicion").setValue(intPosicion);
         limpiarEditsTxt();
     }
@@ -407,5 +452,6 @@ public class SecondActivity extends AppCompatActivity {
         spArrayChofer.clear();
         adapterArrayChofer.notifyDataSetChanged();
         txtPasajeros.setText(null);
+        ScStPasajeros="";
     }
 }

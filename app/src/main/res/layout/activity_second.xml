@@ -201,7 +201,7 @@
                 android:layout_weight="1"
                 android:ems="10"
                 android:hint="ingrese C.I."
-                android:inputType="number" />
+                android:inputType="text" />
         </LinearLayout>
 
     </LinearLayout>
